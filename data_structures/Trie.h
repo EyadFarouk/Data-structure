@@ -9,12 +9,13 @@ private:
     };
     
     TrieNode* root;
-
     bool deleteHelper(TrieNode* node, const std::string& word, int index);
     void clearHelper(TrieNode* node);
+
 public:
     Trie();
     ~Trie();
+    void insert(std::string word);
     void deleteWord(const std::string& word);
     void clear();
 };
