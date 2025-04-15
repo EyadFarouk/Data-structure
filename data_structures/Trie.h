@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <string>
 class Trie {
 private:
     struct TrieNode {
@@ -9,8 +10,12 @@ private:
     
     TrieNode* root;
 
+    bool deleteHelper(TrieNode* node, const std::string& word, int index);
+    void clearHelper(TrieNode* node);
 public:
     Trie();
     ~Trie();
+    void deleteWord(const std::string& word);
+    void clear();
 };
 
