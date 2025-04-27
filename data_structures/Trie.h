@@ -11,7 +11,8 @@ private:
     
     TrieNode* root;
     bool deleteHelper(TrieNode* node, const string& word, int index);
-    void clearHelper(TrieNode* node);
+    void clearHelper(TrieNode* node);    
+    void collectWords(TrieNode* node, string currentWord, vector<string>& result); 
 
 public:
     Trie();
@@ -21,5 +22,6 @@ public:
     void clear();
     bool search(string word);
     bool startsWith(string prefix);
+    vector<string> getWords(string prefix);
 };
 

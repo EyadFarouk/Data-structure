@@ -24,6 +24,17 @@ void Trie::clearHelper(TrieNode *node) {
     }
     node->children.clear();
 }
+
+void Trie::collectWords(TrieNode* node, string currentWord, vector<string>& result) {
+    if (node->isEndOfWord) {
+        result.push_back(currentWord);
+    }
+    for (auto& pair : node->children) {
+        collectWords(pair.second, currentWord + pair.first, result);
+    }
+}
+
+
 Trie::Trie() {
     root = new TrieNode();
     root->isEndOfWord = false;
@@ -43,9 +54,9 @@ void Trie::clear() {
  * function to add word to trie
  * @param word 
  * * */
-void Trie::insert(std::string word)
+void Trie::insert(string word)
 {
-    TrieNode*node=root;
+    TrieNode* node = root;
     for (char ch : word){
         if (!node->children.count(ch))
             node->children[ch]=new TrieNode();
@@ -73,4 +84,20 @@ bool Trie::startsWith(string prefix) {
         node = node->children[c];
     }
     return true;
+}
+
+vector<string> Trie::getWords(string prefix) {
+    vector<string> result;
+    TrieNode* node = root;
+
+    for (char c : prefix) {
+        if (!node->children.count(c)) {
+            return result; 
+        }
+        node = node->children[c];
+    }
+
+    collectWords(node, prefix, result);
+
+    return result;
 }
