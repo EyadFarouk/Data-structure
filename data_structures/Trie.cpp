@@ -1,5 +1,6 @@
 #include "Trie.h"
-bool Trie::deleteHelper(TrieNode *node, const std::string &word, int index) {
+using namespace std;
+bool Trie::deleteHelper(TrieNode *node, const string &word, int index) {
     if(index == word.size()) {
         if(!node->isEndOfWord) return false;
         node->isEndOfWord = false;
@@ -15,6 +16,7 @@ bool Trie::deleteHelper(TrieNode *node, const std::string &word, int index) {
     }
     return node->children.empty() && !node->isEndOfWord;
 }
+
 void Trie::clearHelper(TrieNode *node) {
     for(auto &child : node->children) {
         clearHelper(child.second);
@@ -30,7 +32,7 @@ Trie::Trie() {
 Trie::~Trie() {
     clear();
 }
-void Trie::deleteWord(const std::string &word) {
+void Trie::deleteWord(const string &word) {
     deleteHelper(root, word, 0);
 }
 
@@ -51,4 +53,24 @@ void Trie::insert(std::string word)
     }
     node->isEndOfWord = true;
 
+}
+
+bool Trie::search(string word) {
+    TrieNode* node = root;
+    for (char c : word) {
+        if (!node->children.count(c))
+            return false;
+        node = node->children[c];
+    }
+    return node->isEndOfWord;
+}
+
+bool Trie::startsWith(string prefix) {
+    TrieNode* node = root;
+    for (char c : prefix) {
+        if (!node->children.count(c))
+            return false;
+        node = node->children[c];
+    }
+    return true;
 }

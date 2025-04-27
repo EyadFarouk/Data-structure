@@ -1,22 +1,25 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+using namespace std;
 class Trie {
 private:
     struct TrieNode {
         bool isEndOfWord;
-        std::unordered_map<char, TrieNode*> children;
+        unordered_map<char, TrieNode*> children;
     };
     
     TrieNode* root;
-    bool deleteHelper(TrieNode* node, const std::string& word, int index);
+    bool deleteHelper(TrieNode* node, const string& word, int index);
     void clearHelper(TrieNode* node);
 
 public:
     Trie();
     ~Trie();
-    void insert(std::string word);
-    void deleteWord(const std::string& word);
+    void insert(string word);
+    void deleteWord(const string& word);
     void clear();
+    bool search(string word);
+    bool startsWith(string prefix);
 };
 
