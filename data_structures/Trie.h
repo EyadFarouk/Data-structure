@@ -23,5 +23,6 @@ public:
     bool search(string word);
     bool startsWith(string prefix);
     vector<string> getWords(string prefix);
+    vector<string> bfsWords(string);
 };
 

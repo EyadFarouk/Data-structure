@@ -101,3 +101,38 @@ vector<string> Trie::getWords(string prefix) {
 
     return result;
 }
+
+vector<string> Trie::bfsWords(string prefix) {
+    vector<string> result;
+    TrieNode* node = root;
+
+    for (char c : prefix) {
+        if (!node->children.count(c)) {
+            return result;
+        }
+        node = node->children[c];
+    }
+
+    queue<pair<TrieNode*, string>> q;
+    q.push(make_pair(node, prefix));
+
+    while (!q.empty()) {
+        pair<TrieNode*, string> current = q.front();
+        q.pop();
+
+        TrieNode* currentNode = current.first;
+        string currentWord = current.second;
+
+        if (currentNode->isEndOfWord) {
+            result.push_back(currentWord);
+        }
+
+        for (map<char, TrieNode*>::iterator it = currentNode->children.begin(); it != currentNode->children.end(); ++it) {
+            char childChar = it->first;
+            TrieNode* childNode = it->second;
+            q.push(make_pair(childNode, currentWord + childChar));
+        }
+    }
+
+    return result;
+}
