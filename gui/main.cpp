@@ -3,6 +3,9 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include "data_structures/Trie.h"
+
+Trie trie;
 
 int main(int argc, char *argv[])
 {

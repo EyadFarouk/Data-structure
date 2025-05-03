@@ -1,5 +1,6 @@
 #include "SL_Data.h"
 #include <iostream>
+#include "data_structures/Trie.h"
 #include <fstream>
 #include <unordered_map>
 using namespace std;
@@ -32,8 +33,12 @@ void loadData()
             int value = stoi(data);
             words.insert({ key,value });
         }
-        for (auto i : words)
+        Trie trie;
+        for (auto i : words) {
             cout << i.first << ' ' << i.second << '\n';
+            if (i.second >= 3)
+                trie.insert(i.first);
+        }
         file.close();
     }
 }

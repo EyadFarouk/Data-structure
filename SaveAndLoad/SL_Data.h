@@ -1,4 +1,4 @@
 #pragma once
 
-saveData();
-loadData();
+void saveData();
+void loadData();
