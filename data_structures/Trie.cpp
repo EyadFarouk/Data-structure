@@ -22,7 +22,51 @@ void Trie::clearHelper(TrieNode *node) {
     }
     node->children.clear();
 }
-Trie::Trie() {
+Trie::TrieNode *Trie::traverse(const std::string &prefix) const {
+    TrieNode* node = root;
+    for(auto& c : prefix) {
+        if(!node->children[c])
+            return nullptr;
+        node = node->children[c];
+    }
+    return node;
+}
+void Trie::dfs(TrieNode *node, const std::string &path, std::vector<std::string> &out) const{
+    if (node->isEndOfWord) out.push_back(path);
+    for (int i = 0; i < 26; ++i) 
+        if (node->children[i]) 
+            dfs(node->children[i], path + static_cast<char>('a' + i), out);
+    
+}
+std::vector<std::string> Trie::autocomplete(const std::string& prefix) const {
+    std::vector<std::string> results;
+    TrieNode* node = traverse(prefix);
+    if (!node) return results;
+    dfs(node, prefix, results);
+    return results;
+}
+std::vector<std::string> Trie::autocomplete(const std::string &prefix, const bool &bfs) const {
+    if(!bfs) return autocomplete(prefix);
+    std::vector<std::string> results;
+    TrieNode* node = traverse(prefix);
+    if (!node) return results;
+
+    std::queue<std::pair<TrieNode*, std::string>> q;
+    q.push({ node, "" });
+    while (!q.empty()) {
+        auto curr = q.front(); q.pop();
+        if (curr.first->isEndOfWord) results.push_back(prefix + curr.second);
+        for (char i = 'a'; i <= 'z'; ++i) {
+            if (curr.first->children[i]) {
+                q.push({ curr.first->children[i], curr.second + i });
+            }
+        }
+    }
+    return results;
+
+}
+Trie::Trie()
+{
     root = new TrieNode();
     root->isEndOfWord = false;
 }
@@ -41,11 +85,11 @@ void Trie::clear() {
  * function to add word to trie
  * @param word 
  * * */
-void Trie::insert(std::string word)
+void Trie::insert(std::string& word)
 {
     TrieNode*node=root;
     for (char ch : word){
-        if (!node->children.count(ch))
+        if (!node->children[ch])
             node->children[ch]=new TrieNode();
         node=node->children[ch];
     }

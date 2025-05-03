@@ -9,7 +9,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , fsModel(new QFileSystemModel(this))
+    , fsModel(new QFileSystemModel(this)),
+    wordCounter(new WordCounter(this))
 {
     ui->setupUi(this);
 
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     QDir().mkdir(dummyPath); // Make sure it exists
 
     notesModel->setRootPath(dummyPath);
+
     ui->treeViewNotes->setRootIndex(notesModel->index(dummyPath));
 
 
@@ -190,9 +192,11 @@ void MainWindow::on_saveNote_clicked()
     if (!currentNoteFile.isEmpty()) {
         QFile file(currentNoteFile);
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QString text = ui->plainTextEditNote->toPlainText();
             QTextStream out(&file);
-            out << ui->plainTextEditNote->toPlainText();
+            out << text;
             file.close();
+            wordCounter->addText(text);
         }
     }
 }
