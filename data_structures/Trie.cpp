@@ -1,5 +1,6 @@
 #include "Trie.h"
-bool Trie::deleteHelper(TrieNode *node, const std::string &word, int index) {
+using namespace std;
+bool Trie::deleteHelper(TrieNode *node, const string &word, int index) {
     if(index == word.size()) {
         if(!node->isEndOfWord) return false;
         node->isEndOfWord = false;
@@ -15,6 +16,7 @@ bool Trie::deleteHelper(TrieNode *node, const std::string &word, int index) {
     }
     return node->children.empty() && !node->isEndOfWord;
 }
+
 void Trie::clearHelper(TrieNode *node) {
     for(auto &child : node->children) {
         clearHelper(child.second);
@@ -22,6 +24,7 @@ void Trie::clearHelper(TrieNode *node) {
     }
     node->children.clear();
 }
+
 Trie::TrieNode *Trie::traverse(const std::string &prefix) const {
     TrieNode* node = root;
     for(auto& c : prefix) {
@@ -65,8 +68,19 @@ std::vector<std::string> Trie::autocomplete(const std::string &prefix, const boo
     return results;
 
 }
-Trie::Trie()
-{
+
+
+void Trie::collectWords(TrieNode* node, string currentWord, vector<string>& result) {
+    if (node->isEndOfWord) {
+        result.push_back(currentWord);
+    }
+    for (auto& pair : node->children) {
+        collectWords(pair.second, currentWord + pair.first, result);
+    }
+}
+
+
+Trie::Trie() {
     root = new TrieNode();
     root->isEndOfWord = false;
 }
@@ -74,7 +88,7 @@ Trie::Trie()
 Trie::~Trie() {
     clear();
 }
-void Trie::deleteWord(const std::string &word) {
+void Trie::deleteWord(const string &word) {
     deleteHelper(root, word, 0);
 }
 
@@ -87,7 +101,7 @@ void Trie::clear() {
  * * */
 void Trie::insert(std::string& word)
 {
-    TrieNode*node=root;
+    TrieNode* node = root;
     for (char ch : word){
         if (!node->children[ch])
             node->children[ch]=new TrieNode();
@@ -95,4 +109,40 @@ void Trie::insert(std::string& word)
     }
     node->isEndOfWord = true;
 
+}
+
+bool Trie::search(string word) {
+    TrieNode* node = root;
+    for (char c : word) {
+        if (!node->children.count(c))
+            return false;
+        node = node->children[c];
+    }
+    return node->isEndOfWord;
+}
+
+bool Trie::startsWith(string prefix) {
+    TrieNode* node = root;
+    for (char c : prefix) {
+        if (!node->children.count(c))
+            return false;
+        node = node->children[c];
+    }
+    return true;
+}
+
+vector<string> Trie::getWords(string prefix) {
+    vector<string> result;
+    TrieNode* node = root;
+
+    for (char c : prefix) {
+        if (!node->children.count(c)) {
+            return result; 
+        }
+        node = node->children[c];
+    }
+
+    collectWords(node, prefix, result);
+
+    return result;
 }

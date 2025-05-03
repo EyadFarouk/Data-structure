@@ -3,11 +3,12 @@
 #include <string>
 #include <vector>
 #include <queue>
+using namespace std;
 class Trie {
 private:
     struct TrieNode {
         bool isEndOfWord;
-        std::unordered_map<char, TrieNode*> children;
+        unordered_map<char, TrieNode*> children;
     };
     
     TrieNode* root;
@@ -23,5 +24,9 @@ public:
     void clear();
     std::vector<std::string> autocomplete(const std::string& prefix) const;
     std::vector<std::string> autocomplete(const std::string& prefix, const bool& bfs) const;
+    void collectWords(TrieNode* node, string currentWord, vector<string>& result); 
+    bool search(string word);
+    bool startsWith(string prefix);
+    vector<string> getWords(string prefix);
 };
 
