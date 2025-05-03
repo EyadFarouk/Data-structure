@@ -1,0 +1,4 @@
+#pragma once
+
+saveData();
+loadData();
