@@ -1,0 +1,11 @@
+release/backgroundwidget.o
+release/errorhandler.o
+release/main.o
+release/mainwindow.o
+release/regexmanager.o
+release/trie.o
+release/wordscounter.o
+release/qrc_img.o
+release/qrc_qmake_qmake_qm_files.o
+release/moc_backgroundwidget.o
+release/moc_mainwindow.o
