@@ -18,9 +18,10 @@
 #include <QDir>
 #include "backgroundwidget.h"
 #include "errorhandler.h"
+#include "richtextdelegate.h"
 
 static QString toLower(const QString &s) { return s.toLower(); }
-static QString matchCase(const QString &pattern, const QString &word) {
+static QString matchCase(const QString &pattern,  const QString &word) {
     QString result = word;
     int n = std::min(pattern.size(), word.size());
     for (int i = 0; i < n; ++i) {
@@ -85,15 +86,36 @@ std::vector<std::string> MainWindow::orderSuggestions(const std::string &prefix)
 /// when user type list get updated dynamically
 void MainWindow::onTextChanged(const QString &text) {
     list->clear();
-    QString prefix = toLower(text.trimmed());
-    if (prefix.isEmpty()) return;
+    QString originalPrefix = text.trimmed();
+    QString lowerPrefix = toLower(originalPrefix);
+    if (lowerPrefix.isEmpty()) return;
 
     std::vector<std::string> results;
-    if (prefix.contains('*') || prefix.contains('%'))
-        results = regexManager.getWords(prefix, orderCombo->currentIndex());
-    else results = orderSuggestions(prefix.toStdString());
+    if (lowerPrefix.contains('*') || lowerPrefix.contains('%'))
+        results = regexManager.getWords(lowerPrefix, orderCombo->currentIndex());
+    else
+        results = orderSuggestions(lowerPrefix.toStdString());
+
     for (const auto &w : results) {
-        QString display = QString("%1").arg(QString::fromStdString(w));
+        auto qw = QString::fromStdString(w);
+        QString word = matchCase(originalPrefix, qw);
+        QString display;
+        int originalLength = originalPrefix.length();
+
+        if (lowerPrefix.contains('*') || lowerPrefix.contains('%')) {
+            // Handle regex matches without highlighting
+            display = QString("<span style='font-weight: bold; color: white;'>%1</span>")
+                          .arg(word);
+
+        } else {
+            // Split into prefix + rest and apply casing
+            QString prefixPart = word.left(originalLength);
+            QString casedPrefix = matchCase(originalPrefix, prefixPart);
+            QString rest = word.mid(originalLength);
+            display = QString("<span style='font-weight: bold; color: #2D89EF;'>%1</span><span style='color: white;'>%2</span>")
+                          .arg(casedPrefix, rest);
+        }
+
         QListWidgetItem *item = new QListWidgetItem(display);
         item->setData(Qt::UserRole, QString::fromStdString(w));
         list->addItem(item);
@@ -173,15 +195,34 @@ void MainWindow::onDeleteWord() {
 }
 void MainWindow::onModeSelected(int mode) {
     list->clear();
-    QString prefix = toLower(input->text());
-    if (prefix.isEmpty()) return;
+    QString originalPrefix = input->text().trimmed();
+    QString lowerPrefix = toLower(originalPrefix);
+    if (lowerPrefix.isEmpty()) return;
 
     std::vector<std::string> results;
-    if (prefix.contains('*') || prefix.contains('%'))
-        results = regexManager.getWords(prefix, orderCombo->currentIndex());
-    else results = orderSuggestions(prefix.toStdString());
+    if (lowerPrefix.contains('*') || lowerPrefix.contains('%'))
+        results = regexManager.getWords(lowerPrefix, mode);
+    else
+        results = orderSuggestions(lowerPrefix.toStdString());
+
     for (const auto &w : results) {
-        QString display = QString("%1").arg(QString::fromStdString(w));
+        auto qw = QString::fromStdString(w);
+        QString word = matchCase(originalPrefix, qw);
+        QString display;
+        int originalLength = originalPrefix.length();
+
+        if (lowerPrefix.contains('*') || lowerPrefix.contains('%')) {
+            display = QString("<span style='font-weight: bold; color: white;'>%1</span>")
+            .arg(word);
+        } else {
+            // Declare variables INSIDE this block
+            QString prefixPart = word.left(originalLength);
+            QString casedPrefix = matchCase(originalPrefix, prefixPart);
+            QString rest = word.mid(originalLength);
+            display = QString("<span style='font-weight: bold; color: #2D89EF;'>%1</span><span style='color: white;'>%2</span>")
+                          .arg(casedPrefix, rest);
+        }
+
         QListWidgetItem *item = new QListWidgetItem(display);
         item->setData(Qt::UserRole, QString::fromStdString(w));
         list->addItem(item);
@@ -206,7 +247,7 @@ void MainWindow::applyWindowFlags() {
 
 void MainWindow::initWidgets() {
     // central widget with background
-    auto* central = new BackgroundWidget(":/images/bg.jpg", this);
+    auto* central = new BackgroundWidget(":images/bg.jpg", this);
     setCentralWidget(central);
 
     // title
@@ -229,6 +270,7 @@ void MainWindow::initWidgets() {
     orderCombo->addItems({
         tr("Frequency"), tr("Length"), tr("Lexicographical")
     });
+    list->setItemDelegate(new RichTextDelegate(list));
 }
 
 void MainWindow::initLayouts() {

@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     regexmanager.cpp \
+    richtextdelegate.cpp \
     trie.cpp \
     wordscounter.cpp
 
@@ -22,6 +23,7 @@ HEADERS += \
     errorhandler.h \
     mainwindow.h \
     regexmanager.h \
+    richtextdelegate.h \
     trie.h \
     wordscounter.h
 

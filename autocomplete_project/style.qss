@@ -1,3 +1,4 @@
+
 QWidget {
     background-attachment: fixed;
     background-color: #121212;
@@ -27,7 +28,7 @@ QListWidget {
     border: 1px solid rgba(80, 80, 80, 180);
     border-radius: 6px;
     padding: 4px;
-    font-size: 20px;
+    font-size: 25px;
     max-width: 320px;
 }
 
