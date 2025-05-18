@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -D_REENTRANT $(DEFINES)
-INCPATH       = -I../../../autocompletee -I. -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I. -I/usr/lib64/qt6/mkspecs/linux-g++
+INCPATH       = -I../../../autocomplete_project -I. -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I. -I/usr/lib64/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = autocompletee1.0.0
-DISTDIR = /home/zanaty/repos/Data-structure/autocompletee/build/Desktop-Debug/.tmp/autocompletee1.0.0
+DISTDIR = /home/zanaty/repos/Data-structure/autocomplete_project/build/Desktop-Debug/.tmp/autocompletee1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath-link,/usr/lib64
 LIBS          = $(SUBLIBS) /usr/lib64/libQt6Widgets.so /usr/lib64/libQt6Gui.so /usr/lib64/libQt6Core.so -lpthread -lGLX -lOpenGL   
@@ -53,18 +53,24 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../backgroundwidget.cpp \
+		../../errorhandler.cpp \
+		../../filemanager.cpp \
 		../../main.cpp \
 		../../mainwindow.cpp \
 		../../regexmanager.cpp \
+		../../richtextdelegate.cpp \
 		../../trie.cpp \
 		../../wordscounter.cpp qrc_img.cpp \
 		qrc_qmake_qmake_qm_files.cpp \
 		moc_backgroundwidget.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = backgroundwidget.o \
+		errorhandler.o \
+		filemanager.o \
 		main.o \
 		mainwindow.o \
 		regexmanager.o \
+		richtextdelegate.o \
 		trie.o \
 		wordscounter.o \
 		qrc_img.o \
@@ -250,13 +256,19 @@ DIST          = ../../bg.jpg \
 		/usr/lib64/qt6/mkspecs/features/yacc.prf \
 		/usr/lib64/qt6/mkspecs/features/lex.prf \
 		../../../../autocompletee.pro ../../backgroundwidget.h \
+		../../errorhandler.h \
+		../../filemanager.h \
 		../../mainwindow.h \
 		../../regexmanager.h \
+		../../richtextdelegate.h \
 		../../trie.h \
 		../../wordscounter.h ../../backgroundwidget.cpp \
+		../../errorhandler.cpp \
+		../../filemanager.cpp \
 		../../main.cpp \
 		../../mainwindow.cpp \
 		../../regexmanager.cpp \
+		../../richtextdelegate.cpp \
 		../../trie.cpp \
 		../../wordscounter.cpp
 QMAKE_TARGET  = autocompletee
@@ -652,8 +664,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents ../../autocompletee_en_US.ts $(DISTDIR)/
 	$(COPY_FILE) --parents ../../img.qrc qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../backgroundwidget.h ../../mainwindow.h ../../regexmanager.h ../../trie.h ../../wordscounter.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../backgroundwidget.cpp ../../main.cpp ../../mainwindow.cpp ../../regexmanager.cpp ../../trie.cpp ../../wordscounter.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../backgroundwidget.h ../../errorhandler.h ../../filemanager.h ../../mainwindow.h ../../regexmanager.h ../../richtextdelegate.h ../../trie.h ../../wordscounter.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../backgroundwidget.cpp ../../errorhandler.cpp ../../filemanager.cpp ../../main.cpp ../../mainwindow.cpp ../../regexmanager.cpp ../../richtextdelegate.cpp ../../trie.cpp ../../wordscounter.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents ../../autocompletee_en_US.ts $(DISTDIR)/
 
@@ -691,6 +703,7 @@ compiler_rcc_clean:
 qrc_img.cpp: ../../img.qrc \
 		/usr/lib64/qt6/libexec/rcc \
 		../../style.qss \
+		../../bg2.jpg \
 		../../bg.jpg
 	/usr/lib64/qt6/libexec/rcc -name img ../../img.qrc -o qrc_img.cpp
 
@@ -711,15 +724,16 @@ compiler_moc_header_clean:
 moc_backgroundwidget.cpp: ../../backgroundwidget.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
-	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/zanaty/repos/Data-structure/autocompletee/build/Desktop-Debug/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/zanaty/repos/Data-structure/autocompletee -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15 -I/usr/include/c++/15/x86_64-redhat-linux -I/usr/include/c++/15/backward -I/usr/lib/gcc/x86_64-redhat-linux/15/include -I/usr/local/include -I/usr/include ../../backgroundwidget.h -o moc_backgroundwidget.cpp
+	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/zanaty/repos/Data-structure/autocomplete_project/build/Desktop-Debug/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/zanaty/repos/Data-structure/autocomplete_project -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15 -I/usr/include/c++/15/x86_64-redhat-linux -I/usr/include/c++/15/backward -I/usr/lib/gcc/x86_64-redhat-linux/15/include -I/usr/local/include -I/usr/include ../../backgroundwidget.h -o moc_backgroundwidget.cpp
 
 moc_mainwindow.cpp: ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
 		../../regexmanager.h \
+		../../filemanager.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
-	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/zanaty/repos/Data-structure/autocompletee/build/Desktop-Debug/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/zanaty/repos/Data-structure/autocompletee -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15 -I/usr/include/c++/15/x86_64-redhat-linux -I/usr/include/c++/15/backward -I/usr/lib/gcc/x86_64-redhat-linux/15/include -I/usr/local/include -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/zanaty/repos/Data-structure/autocomplete_project/build/Desktop-Debug/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/zanaty/repos/Data-structure/autocomplete_project -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15 -I/usr/include/c++/15/x86_64-redhat-linux -I/usr/include/c++/15/backward -I/usr/lib/gcc/x86_64-redhat-linux/15/include -I/usr/local/include -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -745,23 +759,38 @@ compiler_clean: compiler_lrelease_clean compiler_rcc_clean compiler_moc_predefs_
 backgroundwidget.o: ../../backgroundwidget.cpp ../../backgroundwidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o backgroundwidget.o ../../backgroundwidget.cpp
 
+errorhandler.o: ../../errorhandler.cpp ../../errorhandler.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o errorhandler.o ../../errorhandler.cpp
+
+filemanager.o: ../../filemanager.cpp ../../filemanager.h \
+		../../wordscounter.h \
+		../../trie.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filemanager.o ../../filemanager.cpp
+
 main.o: ../../main.cpp ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
-		../../regexmanager.h
+		../../regexmanager.h \
+		../../filemanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
 mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
 		../../regexmanager.h \
-		../../backgroundwidget.h
+		../../filemanager.h \
+		../../backgroundwidget.h \
+		../../errorhandler.h \
+		../../richtextdelegate.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
 
 regexmanager.o: ../../regexmanager.cpp ../../regexmanager.h \
 		../../trie.h \
 		../../wordscounter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o regexmanager.o ../../regexmanager.cpp
+
+richtextdelegate.o: ../../richtextdelegate.cpp ../../richtextdelegate.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o richtextdelegate.o ../../richtextdelegate.cpp
 
 trie.o: ../../trie.cpp ../../trie.h \
 		../../wordscounter.h
