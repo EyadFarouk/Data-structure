@@ -74,14 +74,10 @@ void MainWindow::onReturnPressed() {
     const QString word = toLower(input->text().trimmed());
     if (word.isEmpty()) return;
     const std::string w = word.toStdString();
-    if (!trie.contains(w)) {
-        wordsCounter.incrementCount(w);
-        if (wordsCounter.getCount(w) >= 3) {
-            trie.insert(w);
-            wordsCounter.setFreq(w);
-            QMessageBox::information(this, tr("Added"), word + tr(" added to dictionary."));
-            wordsCounter.resetCount(w);
-        }
+    wordsCounter.incrementFreq(w);
+    if (wordsCounter.getFreq(w) == 3) {
+        trie.insert(w);
+        QMessageBox::information(this, tr("Added"), word + tr(" added to dictionary."));
     }
     preview->insertPlainText(input->displayText() + " ");
     input->clear();
@@ -125,7 +121,7 @@ void MainWindow::onAddWord() {
     }
 
     trie.insert(word.toStdString());
-    wordsCounter.setFreq(word.toStdString(), 0);
+    wordsCounter.setFreq(word.toStdString());
     Dialog::showMessage(
         this,
         QMessageBox::Information,
@@ -307,17 +303,14 @@ void MainWindow::updateList(const QString& originalPrefix, int mode) {
         const int len = trimmed.length();
         QString display;
 
-        if (lower.contains('%') || lower.contains('*')) {
-            display = QString("<span style='font-weight:bold;color:white;'>%1</span>")
-            .arg(cased);
-        } else {
+
             const QString prefixPart = cased.left(len);
             const QString rest       = cased.mid(len);
             display = QString(
                           "<span style='font-weight:bold;color:#2D89EF;'>%1</span>"
                           "<span style='color:white;'>%2</span>")
                           .arg(prefixPart, rest);
-        }
+
 
         auto* item = new QListWidgetItem(display);
         item->setData(Qt::UserRole, qw);

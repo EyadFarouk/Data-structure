@@ -6,22 +6,23 @@
 class WordsCounter
 {
 public:
+    static const int DEFAULT_COUNT = 3;
     WordsCounter(const WordsCounter&) = delete;
     static WordsCounter& getInstance() {
         static WordsCounter instance;
         return instance;
     }
-    void incrementCount(const std::string& word);
     void incrementFreq(const std::string& word);
-    int getCount(const std::string& word);
     int getFreq(const std::string& word);
-    void resetCount(const std::string& word);
-    void setFreq(const std::string& word, int count = 1);
+    void setFreq(const std::string& word, int counter = DEFAULT_COUNT);
     void eraseFreq(const std::string& word);
+    std::unordered_map<std::string, int> getFreqMap();
+
+
 private:
     WordsCounter();
     std::unordered_map<std::string, int> freqMap;
-    std::unordered_map<std::string, int> newCounts;
+
 };
 
 #endif // WORDSCOUNTER_H

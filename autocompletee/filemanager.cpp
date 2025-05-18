@@ -15,8 +15,8 @@ void FileManager::load() {
         auto parts = line.trimmed().split(QRegularExpression("\\s+"));
         if (parts.size() >= 1) {
             QString w = parts[0].toLower();
-            trie.insert(w.toStdString());
             int freq = (parts.size() >= 2) ? parts[1].toInt() : 0;
+            if(freq >= WordsCounter::DEFAULT_COUNT) trie.insert(w.toStdString());
             wordsCounter.setFreq(w.toStdString(), freq);
         }
     }
@@ -27,7 +27,6 @@ void FileManager::save() {
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
     QTextStream out(&file);
-    auto words = trie.suggestionsDFS("", 100000);
-    for (const auto &w : words)
-        out << QString::fromStdString(w) << " " << wordsCounter.getFreq(w) << "\n";
+    for (const auto &i : wordsCounter.getFreqMap())
+        out << QString::fromStdString(i.first) << " " << i.second << "\n";
 }

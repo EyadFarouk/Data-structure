@@ -13,6 +13,8 @@ void RichTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->translate(option.rect.topLeft() + QPoint(16, 8));
     doc.drawContents(painter);
     painter->restore();
+    // *p
+    // p*
 }
 
 QSize RichTextDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
