@@ -730,6 +730,7 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
 		../../regexmanager.h \
+		../../filemanager.h \
 		moc_predefs.h \
 		/usr/lib64/qt6/libexec/moc
 	/usr/lib64/qt6/libexec/moc $(DEFINES) --include /home/zanaty/repos/Data-structure/autocomplete_project/build/Desktop-Debug/moc_predefs.h -I/usr/lib64/qt6/mkspecs/linux-g++ -I/home/zanaty/repos/Data-structure/autocomplete_project -I/usr/include/qt6 -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15 -I/usr/include/c++/15/x86_64-redhat-linux -I/usr/include/c++/15/backward -I/usr/lib/gcc/x86_64-redhat-linux/15/include -I/usr/local/include -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
@@ -762,23 +763,25 @@ errorhandler.o: ../../errorhandler.cpp ../../errorhandler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o errorhandler.o ../../errorhandler.cpp
 
 filemanager.o: ../../filemanager.cpp ../../filemanager.h \
-		../../wordscounter.h
+		../../wordscounter.h \
+		../../trie.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filemanager.o ../../filemanager.cpp
 
 main.o: ../../main.cpp ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
-		../../regexmanager.h
+		../../regexmanager.h \
+		../../filemanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
 mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
 		../../regexmanager.h \
+		../../filemanager.h \
 		../../backgroundwidget.h \
 		../../errorhandler.h \
-		../../richtextdelegate.h \
-		../../filemanager.h
+		../../richtextdelegate.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
 
 regexmanager.o: ../../regexmanager.cpp ../../regexmanager.h \
