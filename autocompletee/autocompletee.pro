@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     backgroundwidget.cpp \
+    dialog.cpp \
     errorhandler.cpp \
     filemanager.cpp \
     main.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     backgroundwidget.h \
+    dialog.h \
     errorhandler.h \
     filemanager.h \
     mainwindow.h \

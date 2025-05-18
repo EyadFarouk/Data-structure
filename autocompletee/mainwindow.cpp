@@ -19,6 +19,7 @@
 #include "backgroundwidget.h"
 #include "errorhandler.h"
 #include "richtextdelegate.h"
+#include "dialog.h"
 
 static QString toLower(const QString &s) { return s.toLower(); }
 static QString matchCase(const QString &pattern,  const QString &word) {
@@ -88,42 +89,112 @@ void MainWindow::onReturnPressed() {
 }
 
 void MainWindow::onAddWord() {
-    QString word = QInputDialog::getText(this, "Add Word", "Enter new word:").trimmed();
-    
-    QString errorMessage;
-    if (!ErrorHandler::validateWord(word, errorMessage)) {
-        QMessageBox::warning(this, tr("Invalid Input"), errorMessage);
+    QString word;
+    if (!Dialog::getText(
+            this,
+            tr("Add Word"),
+            tr("Enter new word:"),
+            word
+            )) return;  // user cancelled
+
+    word = word.trimmed();
+    QString error;
+    if (!ErrorHandler::validateWord(word, error)) {
+        Dialog::showMessage(
+            this,
+            QMessageBox::Warning,
+            tr("Invalid Input"),
+            error,
+            tr("OK"),
+            tr("Cancel")
+            );
         return;
     }
-    
+
     word = word.toLower();
     if (trie.contains(word.toStdString())) {
-        QMessageBox::information(this, tr("Exists"), tr("Word already in dictionary."));
+        Dialog::showMessage(
+            this,
+            QMessageBox::Information,
+            tr("Exists"),
+            tr("Word already in dictionary."),
+            tr("OK"),
+            tr("Cancel")
+            );
         return;
     }
-    
+
     trie.insert(word.toStdString());
     wordsCounter.setFreq(word.toStdString(), 0);
-    QMessageBox::information(this, tr("Added"), word + tr(" added successfully to the dictionary."));
+    Dialog::showMessage(
+        this,
+        QMessageBox::Information,
+        tr("Added"),
+        word + tr(" added successfully to the dictionary."),
+        tr("OK"),
+        tr("Cancel")
+        );
 }
 
 void MainWindow::onDeleteWord() {
-    QString prefix = QInputDialog::getText(this, tr("Delete Word"), tr("Enter word or prefix to delete:")).trimmed().toLower();
+    QString prefix;
+    if (!Dialog::getText(
+            this,
+            tr("Delete Word"),
+            tr("Enter word or prefix to delete:"),
+            prefix
+            )) return;
+
+    prefix = prefix.trimmed().toLower();
     if (prefix.isEmpty()) return;
+
     auto matches = trie.suggestionsDFS(prefix.toStdString(), 50);
     if (matches.empty()) {
-        QMessageBox::information(this, tr("None"), tr("No matches found."));
+        Dialog::showMessage(
+            this,
+            QMessageBox::Information,
+            tr("None"),
+            tr("No matches found."),
+            tr("OK"),
+            tr("Cancel")
+            );
         return;
     }
+
     QStringList items;
     for (const auto &m : matches) items << QString::fromStdString(m);
-    QString choice = QInputDialog::getItem(this, tr("Select"), tr("Choose word to delete:"), items, 0, false);
-    if (choice.isEmpty()) return;
+
+    bool ok;
+    QString choice = QInputDialog::getItem(
+        this,
+        tr("Select"),
+        tr("Choose word to delete:"),
+        items,
+        0,
+        false,
+        &ok
+        );
+    if (!ok || choice.isEmpty()) return;
+
     if (trie.remove(choice.toStdString())) {
-        QMessageBox::information(this, tr("Deleted"), choice + tr(" removed."));
         wordsCounter.eraseFreq(choice.toStdString());
+        Dialog::showMessage(
+            this,
+            QMessageBox::Information,
+            tr("Deleted"),
+            choice + tr(" removed."),
+            tr("OK"),
+            tr("Cancel")
+            );
     } else {
-        QMessageBox::warning(this, tr("Error"), tr("Could not delete."));
+        Dialog::showMessage(
+            this,
+            QMessageBox::Warning,
+            tr("Error"),
+            tr("Could not delete."),
+            tr("OK"),
+            tr("Cancel")
+            );
     }
 }
 void MainWindow::onModeSelected(int mode) {
