@@ -54,6 +54,7 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../../backgroundwidget.cpp \
 		../../errorhandler.cpp \
+		../../filemanager.cpp \
 		../../main.cpp \
 		../../mainwindow.cpp \
 		../../regexmanager.cpp \
@@ -65,6 +66,7 @@ SOURCES       = ../../backgroundwidget.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = backgroundwidget.o \
 		errorhandler.o \
+		filemanager.o \
 		main.o \
 		mainwindow.o \
 		regexmanager.o \
@@ -255,12 +257,14 @@ DIST          = ../../bg.jpg \
 		/usr/lib64/qt6/mkspecs/features/lex.prf \
 		../../../../autocompletee.pro ../../backgroundwidget.h \
 		../../errorhandler.h \
+		../../filemanager.h \
 		../../mainwindow.h \
 		../../regexmanager.h \
 		../../richtextdelegate.h \
 		../../trie.h \
 		../../wordscounter.h ../../backgroundwidget.cpp \
 		../../errorhandler.cpp \
+		../../filemanager.cpp \
 		../../main.cpp \
 		../../mainwindow.cpp \
 		../../regexmanager.cpp \
@@ -660,8 +664,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents ../../autocompletee_en_US.ts $(DISTDIR)/
 	$(COPY_FILE) --parents ../../img.qrc qmake_qmake_qm_files.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../backgroundwidget.h ../../errorhandler.h ../../mainwindow.h ../../regexmanager.h ../../richtextdelegate.h ../../trie.h ../../wordscounter.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../backgroundwidget.cpp ../../errorhandler.cpp ../../main.cpp ../../mainwindow.cpp ../../regexmanager.cpp ../../richtextdelegate.cpp ../../trie.cpp ../../wordscounter.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../backgroundwidget.h ../../errorhandler.h ../../filemanager.h ../../mainwindow.h ../../regexmanager.h ../../richtextdelegate.h ../../trie.h ../../wordscounter.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../backgroundwidget.cpp ../../errorhandler.cpp ../../filemanager.cpp ../../main.cpp ../../mainwindow.cpp ../../regexmanager.cpp ../../richtextdelegate.cpp ../../trie.cpp ../../wordscounter.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 	$(COPY_FILE) --parents ../../autocompletee_en_US.ts $(DISTDIR)/
 
@@ -757,6 +761,10 @@ backgroundwidget.o: ../../backgroundwidget.cpp ../../backgroundwidget.h
 errorhandler.o: ../../errorhandler.cpp ../../errorhandler.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o errorhandler.o ../../errorhandler.cpp
 
+filemanager.o: ../../filemanager.cpp ../../filemanager.h \
+		../../wordscounter.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filemanager.o ../../filemanager.cpp
+
 main.o: ../../main.cpp ../../mainwindow.h \
 		../../trie.h \
 		../../wordscounter.h \
@@ -769,7 +777,8 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		../../regexmanager.h \
 		../../backgroundwidget.h \
 		../../errorhandler.h \
-		../../richtextdelegate.h
+		../../richtextdelegate.h \
+		../../filemanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
 
 regexmanager.o: ../../regexmanager.cpp ../../regexmanager.h \

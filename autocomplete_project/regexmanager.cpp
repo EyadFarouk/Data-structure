@@ -11,14 +11,15 @@ std::vector<std::string> RegexManager::orderSuggestions(int mode) {
     return trie.suggestionsDFS("", 50);
 }
 QRegularExpression RegexManager::prefixToRegex(const QString &prefix) {
-    QString escaped;
+    QString pattern = "^";               // anchor at start
     for (auto c : prefix) {
-        if (c == '*') escaped += ".*";
-        else if (c == '%') escaped += "^";
-        else escaped += QRegularExpression::escape(QString(c));
+        if (c == '%')       pattern += ".*";      // SQL-style wildcard
+        else if (c == '_')  pattern += '.';       // SQL “single char” wildcard
+        else if (c == '*')  pattern += ".*";      // alternate wildcard if you like
+        else                 pattern += QRegularExpression::escape(QString(c));
     }
-
-    return QRegularExpression(escaped, QRegularExpression::CaseInsensitiveOption);
+    return QRegularExpression(pattern,
+                              QRegularExpression::CaseInsensitiveOption);
 }
 
 std::vector<std::string> RegexManager::getWords(const QString &prefix, int mode) {

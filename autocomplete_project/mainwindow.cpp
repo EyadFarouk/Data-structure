@@ -38,42 +38,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     initWidgets();
     initLayouts();
     initConnections();
-    loadDictionary();
+    fileManager.load();
 }
 
 MainWindow::~MainWindow() {
-    saveDictionary();
-}
-
-void MainWindow::loadDictionary() {
-
-
-    QFile file("dictionary.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
-    QTextStream in(&file);
-    QString line;
-    while (in.readLineInto(&line)) {
-        auto parts = line.trimmed().split(QRegularExpression("\\s+"));
-        if (parts.size() >= 1) {
-            QString w = parts[0].toLower();
-            trie.insert(w.toStdString());
-            int freq = (parts.size() >= 2) ? parts[1].toInt() : 0;
-            wordsCounter.setFreq(w.toStdString(), freq);
-        }
-    }
-
-
-}
-
-void MainWindow::saveDictionary() const {
-    QFile file("dictionary.txt");
-
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-    QTextStream out(&file);
-    auto words = trie.suggestionsDFS("", 100000);
-    for (const auto &w : words)
-        out << QString::fromStdString(w) << " " << wordsCounter.getFreq(w) << "\n";
-
+    fileManager.save();
 }
 
 /// takes prefix and pass it to trie with the order selected by user
@@ -85,51 +54,15 @@ std::vector<std::string> MainWindow::orderSuggestions(const std::string &prefix)
 
 /// when user type list get updated dynamically
 void MainWindow::onTextChanged(const QString &text) {
-    list->clear();
-    QString originalPrefix = text.trimmed();
-    QString lowerPrefix = toLower(originalPrefix);
-    if (lowerPrefix.isEmpty()) return;
-
-    std::vector<std::string> results;
-    if (lowerPrefix.contains('*') || lowerPrefix.contains('%'))
-        results = regexManager.getWords(lowerPrefix, orderCombo->currentIndex());
-    else
-        results = orderSuggestions(lowerPrefix.toStdString());
-
-    for (const auto &w : results) {
-        auto qw = QString::fromStdString(w);
-        QString word = matchCase(originalPrefix, qw);
-        QString display;
-        int originalLength = originalPrefix.length();
-
-        if (lowerPrefix.contains('*') || lowerPrefix.contains('%')) {
-            // Handle regex matches without highlighting
-            display = QString("<span style='font-weight: bold; color: white;'>%1</span>")
-                          .arg(word);
-
-        } else {
-            // Split into prefix + rest and apply casing
-            QString prefixPart = word.left(originalLength);
-            QString casedPrefix = matchCase(originalPrefix, prefixPart);
-            QString rest = word.mid(originalLength);
-            display = QString("<span style='font-weight: bold; color: #2D89EF;'>%1</span><span style='color: white;'>%2</span>")
-                          .arg(casedPrefix, rest);
-        }
-
-        QListWidgetItem *item = new QListWidgetItem(display);
-        item->setData(Qt::UserRole, QString::fromStdString(w));
-        list->addItem(item);
-    }
+    updateList(text, orderCombo->currentIndex());
 }
 
 /// when user select item from list the word send to preview and clear the list
 void MainWindow::onItemClicked(QListWidgetItem *item) {
-    QString prefix = input->text();
-    QString rawWord = item->data(Qt::UserRole).toString();
-    QString cased = matchCase(prefix, rawWord);
-
-    preview->insertPlainText(cased + " ");
-    wordsCounter.incrementFreq(rawWord.toStdString());
+    const QString prefix = input->text();
+    const QString word = item->data(Qt::UserRole).toString();
+    preview->insertPlainText(matchCase(prefix, word) + ' ');
+    wordsCounter.incrementFreq(word.toStdString());
     input->clear();
     list->clear();
 
@@ -137,15 +70,15 @@ void MainWindow::onItemClicked(QListWidgetItem *item) {
 
 /// when user pressed Enter (or Space) the word in input is send to preview
 void MainWindow::onReturnPressed() {
-    QString word = toLower(input->text().trimmed());
+    const QString word = toLower(input->text().trimmed());
     if (word.isEmpty()) return;
-    std::string w = word.toStdString();
+    const std::string w = word.toStdString();
     if (!trie.contains(w)) {
         wordsCounter.incrementCount(w);
         if (wordsCounter.getCount(w) >= 3) {
             trie.insert(w);
             wordsCounter.setFreq(w);
-            QMessageBox::information(this, "Added", word + " added to dictionary.");
+            QMessageBox::information(this, tr("Added"), word + tr(" added to dictionary."));
             wordsCounter.resetCount(w);
         }
     }
@@ -159,74 +92,42 @@ void MainWindow::onAddWord() {
     
     QString errorMessage;
     if (!ErrorHandler::validateWord(word, errorMessage)) {
-        QMessageBox::warning(this, "Invalid Input", errorMessage);
+        QMessageBox::warning(this, tr("Invalid Input"), errorMessage);
         return;
     }
     
     word = word.toLower();
     if (trie.contains(word.toStdString())) {
-        QMessageBox::information(this, "Exists", "Word already in dictionary.");
+        QMessageBox::information(this, tr("Exists"), tr("Word already in dictionary."));
         return;
     }
     
     trie.insert(word.toStdString());
     wordsCounter.setFreq(word.toStdString(), 0);
-    QMessageBox::information(this, "Added", word + " added successfully to the dictionary.");
+    QMessageBox::information(this, tr("Added"), word + tr(" added successfully to the dictionary."));
 }
 
 void MainWindow::onDeleteWord() {
-    QString prefix = QInputDialog::getText(this, "Delete Word", "Enter word or prefix to delete:").trimmed().toLower();
+    QString prefix = QInputDialog::getText(this, tr("Delete Word"), tr("Enter word or prefix to delete:")).trimmed().toLower();
     if (prefix.isEmpty()) return;
     auto matches = trie.suggestionsDFS(prefix.toStdString(), 50);
     if (matches.empty()) {
-        QMessageBox::information(this, "None", "No matches found.");
+        QMessageBox::information(this, tr("None"), tr("No matches found."));
         return;
     }
     QStringList items;
     for (const auto &m : matches) items << QString::fromStdString(m);
-    QString choice = QInputDialog::getItem(this, "Select", "Choose word to delete:", items, 0, false);
+    QString choice = QInputDialog::getItem(this, tr("Select"), tr("Choose word to delete:"), items, 0, false);
     if (choice.isEmpty()) return;
     if (trie.remove(choice.toStdString())) {
-        QMessageBox::information(this, "Deleted", choice + " removed.");
+        QMessageBox::information(this, tr("Deleted"), choice + tr(" removed."));
         wordsCounter.eraseFreq(choice.toStdString());
     } else {
-        QMessageBox::warning(this, "Error", "Could not delete.");
+        QMessageBox::warning(this, tr("Error"), tr("Could not delete."));
     }
 }
 void MainWindow::onModeSelected(int mode) {
-    list->clear();
-    QString originalPrefix = input->text().trimmed();
-    QString lowerPrefix = toLower(originalPrefix);
-    if (lowerPrefix.isEmpty()) return;
-
-    std::vector<std::string> results;
-    if (lowerPrefix.contains('*') || lowerPrefix.contains('%'))
-        results = regexManager.getWords(lowerPrefix, mode);
-    else
-        results = orderSuggestions(lowerPrefix.toStdString());
-
-    for (const auto &w : results) {
-        auto qw = QString::fromStdString(w);
-        QString word = matchCase(originalPrefix, qw);
-        QString display;
-        int originalLength = originalPrefix.length();
-
-        if (lowerPrefix.contains('*') || lowerPrefix.contains('%')) {
-            display = QString("<span style='font-weight: bold; color: white;'>%1</span>")
-            .arg(word);
-        } else {
-            // Declare variables INSIDE this block
-            QString prefixPart = word.left(originalLength);
-            QString casedPrefix = matchCase(originalPrefix, prefixPart);
-            QString rest = word.mid(originalLength);
-            display = QString("<span style='font-weight: bold; color: #2D89EF;'>%1</span><span style='color: white;'>%2</span>")
-                          .arg(casedPrefix, rest);
-        }
-
-        QListWidgetItem *item = new QListWidgetItem(display);
-        item->setData(Qt::UserRole, QString::fromStdString(w));
-        list->addItem(item);
-    }
+    updateList(input->text(), mode);
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
@@ -314,4 +215,41 @@ void MainWindow::initConnections() {
     connect(orderCombo,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,&MainWindow::onModeSelected);
+}
+
+void MainWindow::updateList(const QString& originalPrefix, int mode) {
+    list->clear();
+    const QString trimmed = originalPrefix.trimmed();
+    if (trimmed.isEmpty()) return;
+
+    const QString lower = toLower(trimmed);
+    std::vector<std::string> results;
+    if (lower.contains(QRegularExpression("[%_*]"))) {
+        results = regexManager.getWords(lower, mode);
+    } else {
+        results = orderSuggestions(lower.toStdString());
+    }
+
+    for (const auto& w : results) {
+        const QString qw = QString::fromStdString(w);
+        const QString cased = matchCase(trimmed, qw);
+        const int len = trimmed.length();
+        QString display;
+
+        if (lower.contains('%') || lower.contains('*')) {
+            display = QString("<span style='font-weight:bold;color:white;'>%1</span>")
+            .arg(cased);
+        } else {
+            const QString prefixPart = cased.left(len);
+            const QString rest       = cased.mid(len);
+            display = QString(
+                          "<span style='font-weight:bold;color:#2D89EF;'>%1</span>"
+                          "<span style='color:white;'>%2</span>")
+                          .arg(prefixPart, rest);
+        }
+
+        auto* item = new QListWidgetItem(display);
+        item->setData(Qt::UserRole, qw);
+        list->addItem(item);
+    }
 }

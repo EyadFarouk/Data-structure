@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     backgroundwidget.cpp \
     errorhandler.cpp \
+    filemanager.cpp \
     main.cpp \
     mainwindow.cpp \
     regexmanager.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 HEADERS += \
     backgroundwidget.h \
     errorhandler.h \
+    filemanager.h \
     mainwindow.h \
     regexmanager.h \
     richtextdelegate.h \

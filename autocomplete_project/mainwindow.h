@@ -11,6 +11,7 @@
 #include "trie.h"
 #include "regexmanager.h"
 #include "wordscounter.h"
+#include "filemanager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -47,10 +48,12 @@ private:
     WordsCounter& wordsCounter = WordsCounter::getInstance();
     std::unordered_map<std::string, int> freqMap;
     std::unordered_map<std::string, int> newCounts;
-    void loadDictionary();
-    void saveDictionary() const;
+    FileManager& fileManager = FileManager::getInstance();
     std::vector<std::string> orderSuggestions(const std::string &prefix);
     RegexManager regexManager;
+
+    // gui functions
+    void updateList(const QString& originalPrefix, int mode);
 };
 
 #endif
