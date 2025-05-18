@@ -303,14 +303,17 @@ void MainWindow::updateList(const QString& originalPrefix, int mode) {
         const int len = trimmed.length();
         QString display;
 
-
+        if (lower.contains('*')) {
+            display = QString("<span style='font-weight:bold;color:white;'>%1</span>")
+            .arg(cased);
+        } else {
             const QString prefixPart = cased.left(len);
             const QString rest       = cased.mid(len);
             display = QString(
                           "<span style='font-weight:bold;color:#2D89EF;'>%1</span>"
                           "<span style='color:white;'>%2</span>")
                           .arg(prefixPart, rest);
-
+        }
 
         auto* item = new QListWidgetItem(display);
         item->setData(Qt::UserRole, qw);

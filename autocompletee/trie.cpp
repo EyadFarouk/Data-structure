@@ -67,6 +67,7 @@ bool Trie::contains(const std::string &word) const {
     }
     // if the word is "maz" and trie has only "mazz" so the word is not exist
     return cur->isEnd;
+
 }
 
 bool Trie::remove(const std::string &word) { return remove(root, word, 0); }
@@ -81,7 +82,7 @@ bool Trie::remove(Node *&node, const std::string &word, int depth) {
         if (node->children.empty()) { delete node; node = nullptr; }
         return true;
     }
-    char c = word[depth];
+    char c = word[depth]; // maz
     if (!node->children.count(c)) return false;
 
     // start dp recursive call to the next node
