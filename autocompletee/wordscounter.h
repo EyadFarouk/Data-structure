@@ -2,6 +2,7 @@
 #define WORDSCOUNTER_H
 #include <unordered_map>
 #include <string>
+using namespace std;
 
 class WordsCounter
 {
@@ -12,16 +13,16 @@ public:
         static WordsCounter instance;
         return instance;
     }
-    void incrementFreq(const std::string& word);
-    int getFreq(const std::string& word);
-    void setFreq(const std::string& word, int counter = DEFAULT_COUNT);
-    void eraseFreq(const std::string& word);
-    std::unordered_map<std::string, int> getFreqMap();
+    void incrementFreq(const string& word);
+    int getFreq(const string& word);
+    void setFreq(const string& word, int counter = DEFAULT_COUNT);
+    void eraseFreq(const string& word);
+    unordered_map<string, int> getFreqMap();
 
 
 private:
     WordsCounter();
-    std::unordered_map<std::string, int> freqMap;
+    unordered_map<string, int> freqMap;
 
 };
 
