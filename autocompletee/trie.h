@@ -24,7 +24,7 @@ public:
 private:
     Trie();
 
-    struct Node { std::unordered_map<char, Node*> children; bool isEnd = false; };
+    struct Node { Node* children [26]; bool isEnd; Node() : isEnd(false) { for(int i = 0; i < 26; ++i) children[i] = nullptr;} } ;
     Node *root;
     void clear(Node *node);
     bool remove(Node *&node, const std::string &word, int depth);

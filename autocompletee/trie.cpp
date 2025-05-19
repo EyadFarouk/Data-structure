@@ -38,9 +38,9 @@ Trie::~Trie() { clear(root); }
 
 // this is a recursive function to delete all sub tries starting from node
 void Trie::clear(Node *node) {
-    for (auto &p : node->children) clear(p.second);
-
-    // delete node that (is end) or its children have been deleted
+    if (!node) return;
+    for (int i = 0; i < 26; ++i)
+        clear(node->children[i]);
     delete node;
 }
 
@@ -48,11 +48,8 @@ void Trie::clear(Node *node) {
 void Trie::insert(const std::string &word) {
     Node *cur = root;
     for (char c : word) {
-        /*
-         * count function in unorderd map return the count of the key without creating new object
-        */
-        if (!cur->children.count(c)) cur->children[c] = new Node(); // make new trie from this letter
-        cur = cur->children[c];
+        if (!cur->children[c - 'a']) cur->children[c - 'a'] = new Node(); // make new trie from this letter
+        cur = cur->children[c - 'a'];
     }
     cur->isEnd = true;
 }
@@ -62,8 +59,8 @@ bool Trie::contains(const std::string &word) const {
     Node *cur = root;
     for (char c : word) {
         // if word is "maz" and trie has only "ma" so that the word is not exist
-        if (!cur->children.count(c)) return false;
-        cur = cur->children.at(c);
+        if (!cur->children[c - 'a']) return false;
+        cur = cur->children[c - 'a'];
     }
     // if the word is "maz" and trie has only "mazz" so the word is not exist
     return cur->isEnd;
@@ -79,15 +76,33 @@ bool Trie::remove(Node *&node, const std::string &word, int depth) {
     if (depth == word.size()) {
         if (!node->isEnd) return false;
         node->isEnd = false;
-        if (node->children.empty()) { delete node; node = nullptr; }
+        bool hasChild = false;
+        for (int i = 0; i < 26; ++i)
+            if (node->children[i]) {
+                hasChild = true;
+                break;
+            }
+        if (!hasChild) { delete node; node = nullptr; }
         return true;
     }
-    char c = word[depth]; // maz
-    if (!node->children.count(c)) return false;
+    char c = word[depth];
+    if (!node->children[c - 'a']) return false;
 
     // start dp recursive call to the next node
-    bool removed = remove(node->children[c], word, depth + 1);
-    if (removed && node->children[c] == nullptr) node->children.erase(c);
+    bool removed = remove(node->children[c - 'a'], word, depth + 1);
+    if (removed && !node->children[c - 'a']) {
+        bool hasChild = false;
+        for (int i = 0; i < 26; ++i) {
+            if (node->children[i]) {
+                hasChild = true;
+                break;
+            }
+        }
+        if (!hasChild && !node->isEnd) {
+            delete node;
+            node = nullptr;
+        }
+    }
     return removed;
 }
 
@@ -95,8 +110,8 @@ std::vector<std::string> Trie::suggestionsDFS(const std::string &prefix, int max
     std::vector<std::string> out;
     Node *cur = root;
     for (char c : prefix) {
-        if (!cur->children.count(c)) return out;
-        cur = cur->children.at(c);
+        if (!cur->children[c - 'a']) return out;
+        cur = cur->children[c - 'a'];
     }
     dfs(cur, prefix, out, maxResults);
     return out;
@@ -106,15 +121,19 @@ std::vector<std::string> Trie::suggestionsBFS(const std::string &prefix, int max
     std::vector<std::string> out;
     Node *cur = root;
     for (char c : prefix) {
-        if (!cur->children.count(c)) return out;
-        cur = cur->children.at(c);
+        if (!cur->children[c - 'a']) return out;
+        cur = cur->children[c - 'a'];
     }
     std::queue<std::pair<Node*, std::string>> q;
     q.push({cur, prefix});
     while (!q.empty() && out.size() < maxResults) {
         auto [node, word] = q.front(); q.pop();
         if (node->isEnd) out.push_back(word);
-        for (auto &p : node->children) q.push({p.second, word + p.first});
+        for (int i = 0; i < 26; ++i) {
+            if (node->children[i]) {
+                q.push({node->children[i], word + char('a' + i)});
+            }
+        }
     }
     return out;
 }
@@ -123,7 +142,7 @@ std::vector<std::string> Trie::suggestionsFreq(const std::string &prefix, int ma
     auto base = suggestionsDFS(prefix, 100000);
     // lambda function to compare with to frequencies
     std::sort(base.begin(), base.end(), [&](auto &a, auto &b){ return wordsCounter.getFreq(a) > wordsCounter.getFreq(b); });
-    if (base.size() > 50) base.resize(50); // return only 50 result
+    if (base.size() > maxResults) base.resize(maxResults);
     return base;
 }
 
@@ -131,8 +150,10 @@ std::vector<std::string> Trie::suggestionsFreq(const std::string &prefix, int ma
 void Trie::dfs(Node *node, const std::string &prefix, std::vector<std::string> &out, int maxResults) const {
     if (out.size() >= maxResults) return;
     if (node->isEnd) out.push_back(prefix);
-    for (auto &p : node->children) {
-        dfs(p.second, prefix + p.first, out, maxResults);
-        if (out.size() >= maxResults) return;
+    for (int i = 0; i < 26; ++i) {
+        if (node->children[i]) {
+            dfs(node->children[i], prefix + char('a' + i), out, maxResults);
+            if (out.size() >= maxResults) return;
+        }
     }
 }
