@@ -28,7 +28,7 @@ This project was a team effort!
 
 ## 📹 Demo
 
-Watch the demo here: [Insert Video Link]
+Watch the demo here: [Link to post](https://www.linkedin.com/posts/eyadahmedfarouk_computerscience-datastructures-autocomplete-activity-7331781046969020416-wF3D?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXUkFYBK0ufhJKfxDyUUfELAlcgaQoxv0k)
 
 ---
 
