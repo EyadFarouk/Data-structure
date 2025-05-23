@@ -28,8 +28,7 @@ This project was a team effort!
 
 ## 📹 Demo
 
-Watch the demo here: [Insert Video Link]  
-Check out the source code: [Insert GitHub Repository Link]
+Watch the demo here: [Insert Video Link]
 
 ---
 
